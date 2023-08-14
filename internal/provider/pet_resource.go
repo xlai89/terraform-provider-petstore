@@ -11,9 +11,11 @@ import (
 
 	"terraform-provider-petstore/petstoreapi"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -106,6 +108,9 @@ func (r *PetResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 				MarkdownDescription: "Pet status",
 				Required:            true,
 				// TODO: validate status input according to its enum
+				Validators: []validator.String{
+					stringvalidator.OneOf("available", "pending", "sold"),
+				},
 			},
 			// TODO: implement the attribute "photo_urls"
 			"photo_urls": schema.ListAttribute{
