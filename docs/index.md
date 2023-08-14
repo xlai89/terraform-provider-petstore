@@ -13,8 +13,8 @@ description: |-
 ## Example Usage
 
 ```terraform
-provider "scaffolding" {
-  # example configuration here
+provider "petstore" {
+  server = "http://localhost:9090/api/v3"
 }
 ```
 
@@ -23,4 +23,4 @@ provider "scaffolding" {
 
 ### Optional
 
-- `endpoint` (String) Example provider attribute
+- `server` (String) the petstore server

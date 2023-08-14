@@ -1,3 +1,3 @@
-provider "scaffolding" {
-  # example configuration here
+provider "petstore" {
+  server = "http://localhost:9090/api/v3"
 }
