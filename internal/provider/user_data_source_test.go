@@ -21,7 +21,9 @@ func TestAccUserDataSource(t *testing.T) {
 				Config: testAccUserDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					// TODO: implement attribute checks
-					resource.TestCheckResourceAttr(dataSourceName, "id", "example-id"),
+					resource.TestCheckResourceAttr(dataSourceName, "firstname", "John"),
+					resource.TestCheckResourceAttr(dataSourceName, "lastname", "James"),
+					resource.TestCheckResourceAttr(dataSourceName, "status", "1"),
 				),
 			},
 		},
@@ -30,7 +32,7 @@ func TestAccUserDataSource(t *testing.T) {
 
 // TODO: implement a valid test config.
 const testAccUserDataSourceConfig = `
-data "scaffolding_example" "test" {
-  configurable_attribute = "example"
+data "petstore_user" "example" {
+	username = "theUser"
 }
 `

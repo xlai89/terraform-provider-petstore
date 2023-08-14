@@ -16,7 +16,7 @@ import (
 // reattach.
 var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 	// TODO: change the key to "petstore" to match our provider name
-	"scaffolding": providerserver.NewProtocol6WithError(New("test")()),
+	"petstore": providerserver.NewProtocol6WithError(New("test")()),
 }
 
 func testAccPreCheck(t *testing.T) {
@@ -25,4 +25,5 @@ func testAccPreCheck(t *testing.T) {
 	// function.
 
 	// TODO: set the env var "PETSTORE_SERVER"
+	t.Setenv("PETSTORE_SERVER", "http://localhost:9090/api/v3")
 }
