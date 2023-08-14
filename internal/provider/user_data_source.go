@@ -33,8 +33,14 @@ type UserDataSource struct {
 // TODO: implement UserDataSourceModel according to "User" from petstore-openapi.yaml
 // UserDataSourceModel describes the data source data model.
 type UserDataSourceModel struct {
-	ConfigurableAttribute types.String `tfsdk:"configurable_attribute"`
-	Id                    types.String `tfsdk:"id"`
+	Id        types.Int64  `tfsdk:"id"`
+	Username  types.String `tfsdk:"username"`
+	Password  types.String `tfsdk:"password"`
+	Firstname types.String `tfsdk:"firstname"`
+	Lastname  types.String `tfsdk:"lastname"`
+	Email     types.String `tfsdk:"email"`
+	Phone     types.String `tfsdk:"phone"`
+	Status    types.Int64  `tfsdk:"status"`
 }
 
 func (d *UserDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -48,12 +54,37 @@ func (d *UserDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 
 		Attributes: map[string]schema.Attribute{
 			// TODO: implement schema for user data source
-			"configurable_attribute": schema.StringAttribute{
-				MarkdownDescription: "Example configurable attribute",
-				Optional:            true,
+			"id": schema.Int64Attribute{
+				MarkdownDescription: "User identifier",
+				Computed:            true,
 			},
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Example identifier",
+			"username": schema.StringAttribute{
+				MarkdownDescription: "User name",
+				Required:            true,
+			},
+			"password": schema.StringAttribute{
+				MarkdownDescription: "User password",
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"firstname": schema.StringAttribute{
+				MarkdownDescription: "User first name",
+				Computed:            true,
+			},
+			"lastname": schema.StringAttribute{
+				MarkdownDescription: "User last name",
+				Computed:            true,
+			},
+			"email": schema.StringAttribute{
+				MarkdownDescription: "User email",
+				Computed:            true,
+			},
+			"phone": schema.StringAttribute{
+				MarkdownDescription: "User phone",
+				Computed:            true,
+			},
+			"status": schema.Int64Attribute{
+				MarkdownDescription: "User status",
 				Computed:            true,
 			},
 		},
@@ -93,8 +124,7 @@ func (d *UserDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	// If applicable, this is a great opportunity to initialize any necessary
 	// provider client data and make a call using it.
 	// TODO: implement the API call using petstoreapi client
-	userResp := petstoreapi.GetUserByNameResponse{}
-	var err error
+	userResp, err := d.client.GetUserByNameWithResponse(ctx, data.Username.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -118,7 +148,10 @@ func (d *UserDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	if userResp.JSON200 == nil {
 		// TODO: implement an error message "User with name %s not found."
 		// use the if statement above as an example.
-		tflog.Info(ctx, "to be implemented")
+		resp.Diagnostics.AddError(
+			"User not found",
+			fmt.Sprintf("User with name %s not found.", data.Username.ValueString()),
+		)
 	}
 
 	if resp.Diagnostics.HasError() {
@@ -129,7 +162,14 @@ func (d *UserDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	user := (*userResp.JSON200)
 
 	// TODO: map response body to schema and populate Computed attribute values
-	data.Id = types.StringValue(fmt.Sprintf("%d", *user.Id))
+	data.Id = types.Int64Value(*user.Id)
+	data.Username = types.StringValue(*user.Username)
+	data.Password = types.StringValue(*user.Password)
+	data.Firstname = types.StringValue(*user.FirstName)
+	data.Lastname = types.StringValue(*user.LastName)
+	data.Email = types.StringValue(*user.Email)
+	data.Phone = types.StringValue(*user.Phone)
+	data.Status = types.Int64Value(int64(*user.UserStatus))
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
