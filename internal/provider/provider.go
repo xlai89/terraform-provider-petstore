@@ -8,10 +8,12 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	// TODO: add an import to use the petstore client.
 )
 
 // Ensure ScaffoldingProvider satisfies various provider interfaces.
@@ -56,10 +58,59 @@ func (p *ScaffoldingProvider) Configure(ctx context.Context, req provider.Config
 	}
 
 	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
+	// If practitioner provided a configuration value for any of the
+	// attributes, it must be a known value.
+	if data.Endpoint.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("endpoint"),
+			"Unknown Example API Host",
+			"The provider cannot create the Example API client as there is an unknown configuration value for the Example API host. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the EXAMPLE_ENDPOINT environment variable.",
+		)
+	}
 
-	// Example client configuration for data sources and resources
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Default values to environment variables, but override
+	// with Terraform configuration value if set.
+
+	// TODO: get server from env var `PETSTORE_SERVER`
+
+	var endpoint string
+	if !data.Endpoint.IsNull() {
+		endpoint = data.Endpoint.ValueString()
+	}
+
+	// If any of the expected configurations are missing, return
+	// errors with provider-specific guidance.
+	if endpoint == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("server"),
+			"Unknown Example API Host",
+			"The provider cannot create the Example API client as there is an unknown configuration value for the Example API host. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the EXAMPLE_ENDPOINT environment variable.",
+		)
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// TODO: Create a new petstore client using the configuration values
 	client := http.DefaultClient
+	var err error
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to Create Example API Client",
+			"An unexpected error occurred when creating the Example API client. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"Example Client Error: "+err.Error(),
+		)
+		return
+	}
+
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }
