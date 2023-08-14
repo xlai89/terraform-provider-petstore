@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -158,9 +159,9 @@ func (r *PetResource) Create(ctx context.Context, req resource.CreateRequest, re
 			Name: types.StringUnknown().ValueStringPointer(),
 		},
 		// TODO: activate the field "PhotoUrls" after it's implemented
-		// PhotoUrls: []string{},
-		Tags:   &[]petstoreapi.Tag{},
-		Status: nil,
+		PhotoUrls: []string{},
+		Tags:      &[]petstoreapi.Tag{},
+		Status:    nil,
 	}
 
 	if plan.Category != nil {
@@ -177,6 +178,9 @@ func (r *PetResource) Create(ctx context.Context, req resource.CreateRequest, re
 	// TODO: add photo urls from the resource schema into api payload
 	// pay attention to the types of the source var (plan.PhotoUrls)
 	// and the target var (params.PhotoUrls)
+	for _, item := range plan.PhotoUrls {
+		params.PhotoUrls = append(params.PhotoUrls, item.ValueString())
+	}
 
 	if plan.Tags != nil && len(*plan.Tags) > 0 {
 		for _, tag := range *plan.Tags {
@@ -244,6 +248,11 @@ func (r *PetResource) Create(ctx context.Context, req resource.CreateRequest, re
 	// TODO: map photo urls from the api response to resource schema
 	// pay attention to the types of the source var (pet.PhotoUrls)
 	// and the target var (plan.PhotoUrls)
+	var tmp []basetypes.StringValue
+	for _, item := range pet.PhotoUrls {
+		tmp = append(tmp, types.StringValue(item))
+	}
+	plan.PhotoUrls = tmp
 
 	if pet.Tags != nil && len(*pet.Tags) > 0 {
 		tmp := make([]petTagModel, len(*pet.Tags))
@@ -328,6 +337,11 @@ func (r *PetResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	// TODO: map photo urls from the api response to resource schema
 	// pay attention to the types of the source var (pet.PhotoUrls)
 	// and the target var (data.PhotoUrls)
+	var tmp []basetypes.StringValue
+	for _, item := range pet.PhotoUrls {
+		tmp = append(tmp, types.StringValue(item))
+	}
+	data.PhotoUrls = tmp
 
 	if pet.Tags != nil && len(*pet.Tags) > 0 {
 		tmp := make([]petTagModel, len(*pet.Tags))
