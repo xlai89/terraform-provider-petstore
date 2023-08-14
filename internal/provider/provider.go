@@ -118,7 +118,7 @@ func (p *PetstoreProvider) Configure(ctx context.Context, req provider.Configure
 
 func (p *PetstoreProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		NewExampleResource,
+		NewPetResource,
 	}
 }
 
