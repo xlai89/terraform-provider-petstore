@@ -40,6 +40,7 @@ type PetResourceModel struct {
 	Tags     *[]petTagModel    `tfsdk:"tags"`
 
 	// TODO: implement the field "PhotoUrls"
+	PhotoUrls []types.String `tfsdk:"photo_urls"`
 }
 
 type petCategoryModel struct {
@@ -106,6 +107,11 @@ func (r *PetResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 				// TODO: validate status input according to its enum
 			},
 			// TODO: implement the attribute "photo_urls"
+			"photo_urls": schema.ListAttribute{
+				MarkdownDescription: "Pet photo URLs",
+				Required:            true,
+				ElementType:         types.StringType,
+			},
 		},
 	}
 }

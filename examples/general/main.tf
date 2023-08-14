@@ -13,3 +13,16 @@ provider "petstore" {
 data "petstore_user" "example" {
   username = "theUser"
 }
+
+resource "petstore_pet" "example" {
+  name = "new dog 2"
+  category = {
+    id   = 1
+    name = "dog"
+  }
+  photo_urls = [
+    "url1",
+    "url2"
+  ]
+  status = "invalidstatus"
+}
