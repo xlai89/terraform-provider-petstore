@@ -512,9 +512,8 @@ func (r *PetResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	// provider client data and make a call using it.
 	// TODO: get the pet id and make an api call for delete
 	// pay attention to the variable types
-	// petId := "fake"
-	delResp := &petstoreapi.DeletePetResponse{}
-	var err error
+	petId, _ := strconv.ParseInt(data.Id.ValueString(), 10, 64)
+	delResp, err := r.client.DeletePetWithResponse(ctx, petId, &petstoreapi.DeletePetParams{})
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to delete pet, got error: %s", err))
 		return
