@@ -24,6 +24,7 @@ func TestAccPetResource(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", "newdog"),
 					resource.TestCheckResourceAttr(resourceName, "status", "available"),
 					// TODO: check if the first photo url is "url1"
+					resource.TestCheckResourceAttr(resourceName, "photo_urls.0", "url1"),
 				),
 			},
 			// ImportState testing
@@ -44,6 +45,7 @@ func TestAccPetResource(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", "anotherdog"),
 					resource.TestCheckResourceAttr(resourceName, "status", "pending"),
 					// TODO: check if the first photo url is still "url1"
+					resource.TestCheckResourceAttr(resourceName, "photo_urls.0", "url1"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
