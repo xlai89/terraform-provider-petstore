@@ -24,5 +24,5 @@ resource "petstore_pet" "example" {
     "url1",
     "url2"
   ]
-  status = "sold"
+  status = "pending"
 }

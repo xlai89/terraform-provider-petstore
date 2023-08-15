@@ -399,6 +399,9 @@ func (r *PetResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 
 	// TODO: implement update for status
+	if !plan.Status.IsNull() && !plan.Status.Equal(data.Status) {
+		params.Status = plan.Status.ValueStringPointer()
+	}
 
 	// If only status is changed, add name to params because it is required
 	if params.Name == nil && params.Status != nil {
@@ -454,6 +457,11 @@ func (r *PetResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	// TODO: map photo urls from the api response to resource schema
 	// pay attention to the types of the source var (pet.PhotoUrls)
 	// and the target var (data.PhotoUrls)
+	var tmp []basetypes.StringValue
+	for _, item := range pet.PhotoUrls {
+		tmp = append(tmp, types.StringValue(item))
+	}
+	data.PhotoUrls = tmp
 
 	if pet.Tags != nil && len(*pet.Tags) > 0 {
 		tmp := make([]petTagModel, len(*pet.Tags))
